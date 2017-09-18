@@ -1,5 +1,13 @@
 package com.amayadream.chick.web.servlet;
 
+import com.amayadream.chick.web.bind.annotation.RequestMethod;
+import com.amayadream.chick.web.handler.HandlerInvoker;
+import com.amayadream.chick.web.handler.impl.DefaultHandlerInvoker;
+import com.amayadream.chick.web.handler.impl.DefaultHandlerMapping;
+import com.amayadream.chick.web.handler.HandlerMapping;
+import com.amayadream.chick.web.mapping.HandlerInfo;
+import com.google.common.base.Charsets;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -20,10 +28,28 @@ public class DispatchServlet extends HttpServlet {
 
     private static Logger logger = LoggerFactory.getLogger(DispatchServlet.class);
 
+    private HandlerMapping handlerMapping = new DefaultHandlerMapping();
+    private HandlerInvoker handlerInvoker = new DefaultHandlerInvoker();
+
     @Override
     protected void service(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        logger.info("welcome, this is dispatch servlet...");
-        super.service(req, resp);
+        req.setCharacterEncoding(Charsets.UTF_8.name());
+
+        String requestMethod = req.getMethod();
+        String requestPath = req.getServletPath() + StringUtils.defaultIfEmpty(req.getPathInfo(), "");
+
+        HandlerInfo handlerInfo = handlerMapping.getHandlerInfo(RequestMethod.valueOf(requestMethod), requestPath);
+
+        if (handlerInfo == null) {
+            resp.sendError(404, "404 not found");
+            return;
+        }
+
+        try {
+            handlerInvoker.invokeHandler(req, resp, handlerInfo);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
 }
