@@ -38,7 +38,7 @@ public class DispatchServlet extends HttpServlet {
         String requestMethod = req.getMethod();
         String requestPath = req.getServletPath() + StringUtils.defaultIfEmpty(req.getPathInfo(), "");
 
-        HandlerInfo handlerInfo = handlerMapping.getHandlerInfo(RequestMethod.valueOf(requestMethod), requestPath);
+        HandlerInfo handlerInfo = handlerMapping.getHandler(RequestMethod.valueOf(requestMethod), requestPath);
 
         if (handlerInfo == null) {
             resp.sendError(404, "404 not found");
@@ -46,7 +46,7 @@ public class DispatchServlet extends HttpServlet {
         }
 
         try {
-            handlerInvoker.invokeHandler(req, resp, handlerInfo);
+            handlerInvoker.invoke(req, resp, handlerInfo);
         } catch (Exception e) {
             e.printStackTrace();
         }

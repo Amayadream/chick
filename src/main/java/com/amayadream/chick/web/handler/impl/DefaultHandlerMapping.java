@@ -17,7 +17,7 @@ import java.util.Map;
 public class DefaultHandlerMapping implements HandlerMapping {
 
     @Override
-    public HandlerInfo getHandlerInfo(RequestMethod requestMethod, String requestPath) {
+    public HandlerInfo getHandler(RequestMethod requestMethod, String requestPath) {
         HandlerInfo handlerInfo = null;
         Map<RequestInfo, HandlerInfo> handlerMap = HandlerInitializer.getHandlerMapping();
         for (Map.Entry<RequestInfo, HandlerInfo> entry : handlerMap.entrySet()) {

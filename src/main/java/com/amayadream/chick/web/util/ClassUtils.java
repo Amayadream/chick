@@ -3,10 +3,15 @@ package com.amayadream.chick.web.util;
 import com.amayadream.chick.web.util.clazz.AnnotationClassScanner;
 import com.amayadream.chick.web.util.clazz.ClassScanner;
 import com.amayadream.chick.web.util.clazz.SuperClassClassScanner;
+import org.objectweb.asm.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.IOException;
+import java.io.InputStream;
 import java.lang.annotation.Annotation;
+import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
 import java.util.List;
 
 /**
@@ -19,7 +24,7 @@ public class ClassUtils {
 
     /**
      * 获取指定包名中所有的类
-     * @param packageName   包名
+     * @param packageName 包名
      * @return
      */
     public static List<Class<?>> getClassList(String packageName) {
@@ -89,6 +94,76 @@ public class ClassUtils {
             throw new RuntimeException(e);
         }
         return cls;
+    }
+
+    /**
+     * 通过ASM获取方法的参数名列表
+     * @param method 方法
+     * @return
+     */
+    public static String[] getMethodParamNames(final Method method) {
+        final String[] paramNames = new String[method.getParameterTypes().length];
+        final String className = method.getDeclaringClass().getName();
+        final ClassWriter cw = new ClassWriter(ClassWriter.COMPUTE_MAXS);
+        //这里为了解决tomcat中ClassReader无法加载到class文件的问题, 所以手动加载字节码文件
+        String classPath = className.replace(".", "/") + ".class";
+        InputStream in = getClassLoader().getResourceAsStream(classPath);
+        if (in == null) {
+            logger.error("类 {} 未找到!", classPath);
+            throw new RuntimeException("读取方法参数名称中出现错误: 类加载错误!");
+        }
+        ClassReader cr;
+        try {
+            cr = new ClassReader(in);
+        } catch (IOException e) {
+            logger.error("读取方法参数名称中出现错误: 类加载错误!", e);
+            throw new RuntimeException(e);
+        }
+        cr.accept(new ClassVisitor(Opcodes.ASM5, cw) {
+            @Override
+            public MethodVisitor visitMethod(final int access,
+                                             final String name, final String desc,
+                                             final String signature, final String[] exceptions) {
+                final Type[] types = Type.getArgumentTypes(desc);
+                if (!name.equals(method.getName()) || !compareTo(types, method.getParameterTypes())) {
+                    return super.visitMethod(access, name, desc, signature, exceptions);
+                }
+                MethodVisitor mv = cv.visitMethod(access, name, desc, signature, exceptions);
+                return new MethodVisitor(Opcodes.ASM5, mv) {
+                    @Override
+                    public void visitLocalVariable(String name, String desc,
+                                                   String signature, Label start, Label end, int index) {
+                        int i = index - 1;
+                        if (Modifier.isStatic(method.getModifiers())) {
+                            i = index;
+                        }
+                        if (i >= 0 && i < paramNames.length) {
+                            paramNames[i] = name;
+                        }
+                        super.visitLocalVariable(name, desc, signature, start, end, index);
+                    }
+                };
+            }
+        }, 0);
+        return paramNames;
+    }
+
+    /**
+     * 类型比较
+     * @param types
+     * @param classes
+     * @return
+     */
+    private static boolean compareTo(Type[] types, Class<?>[] classes) {
+        if (types.length != classes.length) {
+            return false;
+        }
+        for (int i = 0; i < types.length; i++) {
+            if(!Type.getType(classes[i]).equals(types[i])) {
+                return false;
+            }
+        }
+        return true;
     }
 
 }

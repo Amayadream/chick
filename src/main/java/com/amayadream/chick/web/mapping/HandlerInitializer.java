@@ -3,6 +3,7 @@ package com.amayadream.chick.web.mapping;
 import com.amayadream.chick.web.bind.annotation.Controller;
 import com.amayadream.chick.web.bind.annotation.RequestMapping;
 import com.amayadream.chick.web.util.ClassUtils;
+import com.amayadream.chick.web.util.Constants;
 import com.amayadream.chick.web.util.PathUtils;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.ArrayUtils;
@@ -27,7 +28,7 @@ public class HandlerInitializer {
     private static final Map<RequestInfo, HandlerInfo> handlerMap = new LinkedHashMap<>();
 
     static {
-        List<Class<?>> controllers = ClassUtils.getClassListByAnnotation("com.amayadream.chick", Controller.class);
+        List<Class<?>> controllers = ClassUtils.getClassListByAnnotation(Constants.BASE_PACKAGE, Controller.class);
         if (CollectionUtils.isNotEmpty(controllers)) {
             Map<RequestInfo, HandlerInfo> commonMap = new HashMap<>();
             controllers.forEach(

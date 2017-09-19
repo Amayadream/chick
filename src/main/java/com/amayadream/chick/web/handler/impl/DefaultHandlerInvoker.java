@@ -1,14 +1,15 @@
 package com.amayadream.chick.web.handler.impl;
 
+import com.amayadream.chick.web.handler.ConverterHelper;
 import com.amayadream.chick.web.handler.HandlerInvoker;
 import com.amayadream.chick.web.handler.ViewResolver;
 import com.amayadream.chick.web.mapping.HandlerInfo;
+import com.amayadream.chick.web.util.ClassUtils;
 import org.apache.commons.lang3.ArrayUtils;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.lang.reflect.Method;
-import java.lang.reflect.Parameter;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -21,24 +22,50 @@ public class DefaultHandlerInvoker implements HandlerInvoker {
     private ViewResolver viewResolver = new DefaultViewResolver();
 
     @Override
-    public void invokeHandler(HttpServletRequest req, HttpServletResponse resp, HandlerInfo handlerInfo) throws Exception {
+    public void invoke(HttpServletRequest req, HttpServletResponse resp, HandlerInfo handlerInfo) throws Exception {
         Class<?> clazz = handlerInfo.getClazz();
         Method method = handlerInfo.getMethod();
         Object controller = clazz.newInstance();
 
-        List<Object> params = createMethodParams(req, handlerInfo);
+        List<Object> params = createMethodParams(req, resp, handlerInfo);
         method.setAccessible(true);
         Object result = method.invoke(controller, params.toArray());
 
         viewResolver.resolverView(req, resp, result);
     }
 
-    public List<Object> createMethodParams(HttpServletRequest req, HandlerInfo handlerInfo) {
+    /**
+     * 参数解析器
+     * @param req
+     * @param resp
+     * @param handlerInfo
+     * @return
+     */
+    public List<Object> createMethodParams(HttpServletRequest req, HttpServletResponse resp, HandlerInfo handlerInfo) {
         List<Object> params = new ArrayList<>();
-        Parameter[] parameters = handlerInfo.getMethod().getParameters();
-        if (ArrayUtils.isNotEmpty(parameters)) {
-            for (Parameter parameter : parameters) {
-                params.add(req.getParameter(parameter.getDeclaringExecutable().getName()));
+        String[] paramNames = ClassUtils.getMethodParamNames(handlerInfo.getMethod());
+        Class<?>[] classes = handlerInfo.getMethod().getParameterTypes();
+        if (ArrayUtils.isNotEmpty(paramNames)) {
+            for (int i = 0; i < paramNames.length; i++) {
+                if (HttpServletRequest.class.equals(classes[i])) {
+                    params.add(req);
+                    continue;
+                }
+                if (HttpServletResponse.class.equals(classes[i])) {
+                    params.add(resp);
+                    continue;
+                }
+                String source = req.getParameter(paramNames[i]);
+                if (source == null) {
+                    params.add(null);
+                    continue;
+                }
+                if (String.class.equals(classes[i])) {
+                    params.add(source);
+                    continue;
+                }
+                Object convertResult = ConverterHelper.convert(source, classes[i].getName());
+                params.add(convertResult);
             }
         }
         return params;

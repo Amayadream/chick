@@ -11,6 +11,6 @@ import javax.servlet.http.HttpServletResponse;
  */
 public interface HandlerInvoker {
 
-    void invokeHandler(HttpServletRequest req, HttpServletResponse resp, HandlerInfo handlerInfo) throws Exception;
+    void invoke(HttpServletRequest req, HttpServletResponse resp, HandlerInfo handlerInfo) throws Exception;
 
 }

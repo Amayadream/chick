@@ -9,6 +9,6 @@ import com.amayadream.chick.web.mapping.HandlerInfo;
  */
 public interface HandlerMapping {
 
-    HandlerInfo getHandlerInfo(RequestMethod requestMethod, String requestPath);
+    HandlerInfo getHandler(RequestMethod requestMethod, String requestPath);
 
 }

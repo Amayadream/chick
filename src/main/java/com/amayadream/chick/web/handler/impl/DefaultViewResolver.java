@@ -3,6 +3,7 @@ package com.amayadream.chick.web.handler.impl;
 import com.alibaba.fastjson.JSONObject;
 import com.amayadream.chick.web.handler.ViewResolver;
 import com.amayadream.chick.web.servlet.View;
+import com.amayadream.chick.web.util.Constants;
 import com.google.common.base.Charsets;
 import org.apache.commons.collections4.MapUtils;
 
@@ -21,9 +22,10 @@ public class DefaultViewResolver implements ViewResolver {
 
     @Override
     public void resolverView(HttpServletRequest req, HttpServletResponse resp, Object result) {
+        //TODO 视图解析改造
         if (result instanceof View) {
             View view = (View) result;
-            String path = "/WEB-INF/view/" + view.getPath();
+            String path = Constants.VIEW_PATH + view.getPath();
             Map<String, Object> data = view.getAttributes();
             if (MapUtils.isNotEmpty(data)) {
                 for (Map.Entry<String, Object> entry : data.entrySet()) {
