@@ -44,15 +44,15 @@ public class ConverterHelper {
     /**
      *
      * @param source
-     * @param targetType
+     * @param targetClass
      * @return
      */
-    public static Object convert(Object source, String targetType) {
+    public static Object convert(Object source, Class<?> targetClass) {
         if (source == null) {
             return null;
         }
         for (Map.Entry<String, ConverterHandler> entry : converters.entrySet()) {
-            if (entry.getKey().equals(targetType)) {
+            if (entry.getKey().equals(targetClass.getName())) {
                 ConverterHandler handler = entry.getValue();
                 try {
                     return handler.getMethod().invoke(handler.getInstance(), source);

@@ -7,11 +7,12 @@
     <version>1.0-SNAPSHOT</version>
     <name>chick Maven Webapp</name>
     <url>http://maven.apache.org</url>
+
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
-    <dependencies>
 
+    <dependencies>
         <!-- json -->
         <dependency>
             <groupId>com.alibaba</groupId>
@@ -94,8 +95,8 @@
             <artifactId>logback-core</artifactId>
             <version>1.2.3</version>
         </dependency>
-
     </dependencies>
+
     <build>
         <finalName>chick</finalName>
         <resources>

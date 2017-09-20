@@ -64,7 +64,7 @@ public class DefaultHandlerInvoker implements HandlerInvoker {
                     params.add(source);
                     continue;
                 }
-                Object convertResult = ConverterHelper.convert(source, classes[i].getName());
+                Object convertResult = ConverterHelper.convert(source, classes[i]);
                 params.add(convertResult);
             }
         }

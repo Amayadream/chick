@@ -2,9 +2,9 @@ package com.amayadream.chick.web.servlet;
 
 import com.amayadream.chick.web.bind.annotation.RequestMethod;
 import com.amayadream.chick.web.handler.HandlerInvoker;
+import com.amayadream.chick.web.handler.HandlerMapping;
 import com.amayadream.chick.web.handler.impl.DefaultHandlerInvoker;
 import com.amayadream.chick.web.handler.impl.DefaultHandlerMapping;
-import com.amayadream.chick.web.handler.HandlerMapping;
 import com.amayadream.chick.web.mapping.HandlerInfo;
 import com.google.common.base.Charsets;
 import org.apache.commons.lang3.StringUtils;
@@ -37,6 +37,11 @@ public class DispatchServlet extends HttpServlet {
 
         String requestMethod = req.getMethod();
         String requestPath = req.getServletPath() + StringUtils.defaultIfEmpty(req.getPathInfo(), "");
+
+        //去除尾部/
+        if (requestPath.endsWith("/")) {
+            requestPath = requestPath.substring(0, requestPath.length() - 1);
+        }
 
         HandlerInfo handlerInfo = handlerMapping.getHandler(RequestMethod.valueOf(requestMethod), requestPath);
 

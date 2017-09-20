@@ -64,7 +64,7 @@ public class HandlerInitializer {
             RequestInfo requestInfo = new RequestInfo(methodMapping.method(), path);
             HandlerInfo handlerInfo = new HandlerInfo(clazz, method);
             commonMap.put(requestInfo, handlerInfo);
-            logger.debug("add handler mapping: method={}, route={}", requestInfo.getMethod(), requestInfo.getPath());
+            logger.info("add handler mapping: method={}, route={}", requestInfo.getMethod(), requestInfo.getPath());
         }
     }
 
