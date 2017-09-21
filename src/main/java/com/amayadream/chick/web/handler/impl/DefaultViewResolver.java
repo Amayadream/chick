@@ -8,6 +8,9 @@ import com.amayadream.chick.web.util.PathUtils;
 import com.google.common.base.Charsets;
 import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -23,14 +26,37 @@ import java.util.Map;
  */
 public class DefaultViewResolver implements ViewResolver {
 
+    private static Logger logger = LoggerFactory.getLogger(DefaultViewResolver.class);
+
+    public static final String REDIRECT_TAG = "redirect:";
+
     @Override
     public void resolverView(HttpServletRequest req, HttpServletResponse resp, Object result) {
-        //TODO 视图解析改造
         if (result == null || resp.isCommitted()) {
+            logger.info("no view or response is committed!");
             return;
         }
         if (result instanceof ModelAndView) {
             ModelAndView view = (ModelAndView) result;
+            if (StringUtils.isEmpty(view.getView())) {
+                logger.info("no view!");
+                return;
+            }
+            if (view.getView().startsWith(REDIRECT_TAG)) {   //重定向
+                String redirectPath = view.getView().substring(REDIRECT_TAG.length(), view.getView().length());
+                try {
+                    Map<String, Object> data = view.getModel();
+                    if (MapUtils.isNotEmpty(data)) {
+                        for (Map.Entry<String, Object> entry : data.entrySet()) {
+                            req.getSession().setAttribute(entry.getKey(), entry.getValue());
+                        }
+                    }
+                    resp.sendRedirect(redirectPath);
+                    return;
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
             String path = "/" + PathUtils.pure(Constants.VIEW_PREFIX) + "/" + PathUtils.pure(view.getView()) + Constants.VIEW_SUFFIX;
             Map<String, Object> data = view.getModel();
             if (MapUtils.isNotEmpty(data)) {

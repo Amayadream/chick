@@ -39,6 +39,13 @@ public class SampleController {
         return result;
     }
 
+    @RequestMapping(value = "/redirect", method = RequestMethod.GET)
+    public ModelAndView redirect(String name) {
+        ModelAndView view = new ModelAndView("redirect:/sample/hello");
+        view.addObject("name", name);
+        return view;
+    }
+
     @RequestMapping(value = "/download", method = RequestMethod.GET)
     public void download(HttpServletResponse response) throws IOException {
         InputStream in = ClassUtils.getClassLoader().getResourceAsStream("logback.xml");
