@@ -1,6 +1,7 @@
 package com.amayadream.chick.web;
 
 import com.alibaba.fastjson.JSONObject;
+import com.amayadream.chick.ioc.annotation.Component;
 import com.amayadream.chick.web.bind.annotation.Controller;
 import com.amayadream.chick.web.bind.annotation.RequestMapping;
 import com.amayadream.chick.web.bind.annotation.RequestMethod;
@@ -20,6 +21,7 @@ import java.util.Date;
  * @date :   2017-09-19 12:45
  */
 @Controller
+@Component
 @RequestMapping(value = "/sample")
 public class SampleController {
 

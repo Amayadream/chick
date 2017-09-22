@@ -1,4 +1,4 @@
-package com.amayadream.chick.web.bind.annotation;
+package com.amayadream.chick.ioc.annotation;
 
 import java.lang.annotation.*;
 
