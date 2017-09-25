@@ -1,10 +1,14 @@
 package com.amayadream.chick.web.servlet;
 
 import com.amayadream.chick.web.bind.annotation.RequestMethod;
+import com.amayadream.chick.web.handler.ExceptionResolver;
 import com.amayadream.chick.web.handler.HandlerInvoker;
 import com.amayadream.chick.web.handler.HandlerMapping;
+import com.amayadream.chick.web.handler.ViewResolver;
+import com.amayadream.chick.web.handler.impl.DefaultExceptionResolver;
 import com.amayadream.chick.web.handler.impl.DefaultHandlerInvoker;
 import com.amayadream.chick.web.handler.impl.DefaultHandlerMapping;
+import com.amayadream.chick.web.handler.impl.DefaultViewResolver;
 import com.amayadream.chick.web.mapping.HandlerInfo;
 import com.google.common.base.Charsets;
 import org.apache.commons.lang3.StringUtils;
@@ -30,6 +34,8 @@ public class DispatchServlet extends HttpServlet {
 
     private HandlerMapping handlerMapping = new DefaultHandlerMapping();
     private HandlerInvoker handlerInvoker = new DefaultHandlerInvoker();
+    private ExceptionResolver exceptionResolver = new DefaultExceptionResolver();
+    private ViewResolver viewResolver = new DefaultViewResolver();
 
     @Override
     protected void service(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
@@ -53,7 +59,8 @@ public class DispatchServlet extends HttpServlet {
         try {
             handlerInvoker.invoke(req, resp, handlerInfo);
         } catch (Exception e) {
-            e.printStackTrace();
+            ModelAndView view = exceptionResolver.resolveException(req, resp, e);
+            viewResolver.resolverView(req, resp, view);
         }
     }
 
