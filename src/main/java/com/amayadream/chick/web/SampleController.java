@@ -9,6 +9,7 @@ import com.amayadream.chick.web.servlet.ModelAndView;
 import com.amayadream.chick.web.util.ClassUtils;
 import org.apache.commons.io.IOUtils;
 
+import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
@@ -60,6 +61,17 @@ public class SampleController {
         IOUtils.copy(in, out);
         IOUtils.closeQuietly(in);
         IOUtils.closeQuietly(out);
+    }
+
+    @Resource
+    private Sample sample;
+
+    @RequestMapping(value = "/ioc", method = RequestMethod.GET)
+    public Sample ioc() {
+        String s = null;
+        s.toString();
+        System.out.println(sample);
+        return sample;
     }
 
 }

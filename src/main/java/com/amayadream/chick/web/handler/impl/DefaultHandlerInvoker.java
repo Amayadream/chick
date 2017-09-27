@@ -1,5 +1,6 @@
 package com.amayadream.chick.web.handler.impl;
 
+import com.amayadream.chick.ioc.BeanHelper;
 import com.amayadream.chick.web.handler.ConverterHelper;
 import com.amayadream.chick.web.handler.HandlerInvoker;
 import com.amayadream.chick.web.handler.ViewResolver;
@@ -25,7 +26,8 @@ public class DefaultHandlerInvoker implements HandlerInvoker {
     public void invoke(HttpServletRequest req, HttpServletResponse resp, HandlerInfo handlerInfo) throws Exception {
         Class<?> clazz = handlerInfo.getClazz();
         Method method = handlerInfo.getMethod();
-        Object controller = clazz.newInstance();
+        //FIXME 这里要防止异常
+        Object controller = BeanHelper.getBean(clazz);
 
         List<Object> params = createMethodParams(req, resp, handlerInfo);
         method.setAccessible(true);

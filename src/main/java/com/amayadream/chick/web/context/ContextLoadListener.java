@@ -2,6 +2,7 @@ package com.amayadream.chick.web.context;
 
 import com.amayadream.chick.ioc.BeanHelper;
 import com.amayadream.chick.ioc.IocHelper;
+import com.amayadream.chick.web.util.ClassUtils;
 import com.amayadream.chick.web.util.Constants;
 import com.amayadream.chick.web.util.PathUtils;
 import org.slf4j.Logger;
@@ -23,9 +24,6 @@ public class ContextLoadListener implements ServletContextListener {
 
     private static Logger logger = LoggerFactory.getLogger(ContextLoadListener.class);
 
-    private BeanHelper beanHelper = new BeanHelper();
-    private IocHelper iocHelper = new IocHelper();
-
     @Override
     public void contextInitialized(ServletContextEvent event) {
         logger.info("ContextLoadListener is init...");
@@ -33,6 +31,9 @@ public class ContextLoadListener implements ServletContextListener {
         ServletContext servletContext = event.getServletContext();
         registerDefaultServlet(servletContext);
         registerJspServlet(servletContext);
+
+        ClassUtils.loadClass(BeanHelper.class.getName(), true);
+        ClassUtils.loadClass(IocHelper.class.getName(), true);
     }
 
     private void registerDefaultServlet(ServletContext context) {
